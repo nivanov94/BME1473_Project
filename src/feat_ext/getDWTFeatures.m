@@ -67,7 +67,7 @@ else
       case 4
         % add the total energy of the DWT coeffeicients to the feature vector
         dt = 1/Fs;
-        cellenergy = @(x) trapz((1:length(cell2mat(x)))*dt,cell2mat(x).^2);
+        cellenergy = @(x) trapz((1:length(cell2mat(x)))*dt,abs(cell2mat(x)).^2);
         feat_vector(l(i):end_index) = arrayfun(cellenergy,dlevel_coeffs);
       case 5
         % add the minimum value of each DWT coefficient to the feature vector

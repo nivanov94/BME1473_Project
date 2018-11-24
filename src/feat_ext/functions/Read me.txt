@@ -1,0 +1,24 @@
+Main function: get_all_features
+
+Default path:
+EEGLAB: F:\BME1473\Project\eeglab\functions
+Functions for extraction: F:\BME1473\Project\Simplified\functions
+Raw data: F:\BME1473\Project\downsampled_data
+
+Workflow:
+1. All the parameters were stored in load_param.m, param
+  1.1 Parameters for your functions start at line 98
+2. All operation (frame-based) were processed in extract_features.m 
+  2.1 Parameters for your functions were loaded at line 81
+  2.2 Frame-based calculation started at line 186
+  2.3 Calculation was updated to features at line 680
+  2.4 Skewness and Kurtosis were provided by built-in functions.
+3. All labels were process in extract_labels.m
+  3.1 Parameters for your functions were loaded at line 78
+  3.2 Labels were updated at line 670
+
+Other Key parameters:
+1. ICA on/off: get_all_features.m, line 12
+2. Name of output mat files: get_all_features.m, line 86
+
+I attached a patient data (P02) for testing.

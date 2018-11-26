@@ -50,12 +50,15 @@ for k = 1:folds
   test_set{k}       = te_set;
 end
 
+save('data_sets.mat', 'training_set', 'validation_set', 'test_set');
+
 % clean up variables
 clear tr_set; clear te_set; clear va_set; clear k; clear i; clear train_start_index;
 
 
 ICA = false;
-CSP = false;
+CSP = true;
+part = 1;
 
 params = load_params('eeg');
 
@@ -94,23 +97,44 @@ if CSP
         load([folder '\epoch_inds.mat']);
         % splitting the data itself.
         clearing_mats = split_data(clearing_inds, data);
+        speaking_mats = split_data(speaking_inds, data);
         thinking_mats = split_data(thinking_inds, data);
         num_e = length(clearing_mats);
+        
+        s = 1:2:(num_e*2);
+        listening_mats = speaking_mats(s);
 
+        clear speaking_mats;
+        
         % Getting the prompts.
-        prompts = get_prompts(labels_fn);
-        num_prompts = [getNumLabel(prompts) zeros(1,num_e)]; % add zeros for the clearing samples
+        if part == 1
+            % 0 -> clearing
+            % 1 -> listening
+            % 2 -> thinking
+            class_labels = [zeros(1,num_e) ones(1,num_e) 2*ones(1,num_e)];
+        else
+            classes_labels = cell{1,5};
+            classes_labels{1} = {'/piy/', '/diy/', '/tiy/', '/iy/'};
+            classes_labels{2} = {'/uw/'};
+            classes_labels{3} = {'/m/'};
+            classes_labels{4} = {'/pat/'};
+            classes_labels{5} = {'/pot/'};
+            prompts = get_prompts(labels_fn);
+            class_labels = getNumLabel(prompts,classes_labels);
+        end
 
-        unique_classes = unique(num_prompts);
+        %num_prompts = [getNumLabel(prompts) zeros(1,num_e)]; % add zeros for the clearing samples
+
+        unique_classes = unique(class_labels);
         filters = params.feature.csp.bands;
 
         % computing the EEG features.
         disp('Computing the class covariance matrices');
 
         % combine the thinking and clearing data
-        all_trial_eegs = [thinking_mats clearing_mats];
+        all_trial_eegs = [clearing_mats listening_mats thinking_mats];
         % garbage collection
-        clear clearing_mats; clear thinking_mats; clear EEG; clear data;
+        clear clearing_mats; clear thinking_mats; clear listening_mats; clear EEG; clear data;
  
         if empty
             disp('Allocating composite covariance matrices');
@@ -126,7 +150,7 @@ if CSP
             for band = 1:size(filters,1)
                 disp(['    filter: ',num2str(band)]);
                 [C1(class,band,:,:), C2(class,band,:,:)] = getCSPCompCovMat(all_trial_eegs,...
-                                                                 num_prompts==unique_classes(class),...
+                                                                 class_labels==unique_classes(class),...
                                                                  filters(band,:)/(params.fs/2),...
                                                                  ICA_Xform);
             end
@@ -192,16 +216,22 @@ if CSP
         load([folder '\epoch_inds.mat']);
         % splitting the data itself.
         clearing_mats = split_data(clearing_inds, data);
+        speaking_mats = split_data(speaking_inds, data);
         thinking_mats = split_data(thinking_inds, data);
         num_e = length(clearing_mats);
+        
+        s = 1:2:(num_e*2);
+        listening_mats = speaking_mats(s);
 
-        unique_classes = unique(num_prompts);
+        clear speaking_mats;
+        
+        unique_classes = unique(class_labels);
         filters = params.feature.csp.bands;
 
         % computing the EEG features.
         % combine the thinking and clearing data
-        all_trial_eegs = [thinking_mats clearing_mats];
-
+        all_trial_eegs = [clearing_mats listening_mats thinking_mats];
+      
         CSP_feats = cell(1,folds);
         for k = 1:folds
             fold_Wcsp = Wcsp{k};
@@ -226,9 +256,9 @@ if CSP
 
         % save the data
         if ICA
-             save([folder '\CSP_features_ICA.mat'],'CSP_feats');
+             save([folder '\CSP_features_P1_ICA.mat'],'CSP_feats');
         else
-             save([folder '\CSP_features_noICA.mat'],'CSP_feats');
+             save([folder '\CSP_features_P1_noICA.mat'],'CSP_feats');
         end
     end
 end

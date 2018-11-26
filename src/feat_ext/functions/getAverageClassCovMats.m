@@ -11,16 +11,16 @@ function [C1,C2] = getAverageClassCovMats(E,labels)
 C1_samples = 0;
 C2_samples = 0;
 
-C1 = zeros(size(E,2));
-C2 = zeros(size(E,2));
+C1 = zeros(size(E{1},1));
+C2 = zeros(size(E{1},1));
 
 % iterate through all samples
-for i = 1:size(E,1)
+for i = 1:length(E)
   if labels(i) == 0
-    C1 = C1 + getNormalizedCovMat(squeeze(E(i,:,:)));
+    C1 = C1 + getNormalizedCovMat(E{i});
     C1_samples = C1_samples + 1;
   else
-    C2 = C2 + getNormalizedCovMat(squeeze(E(i,:,:)));
+    C2 = C2 + getNormalizedCovMat(E{i});
     C2_samples = C2_samples + 1;
   end
 end

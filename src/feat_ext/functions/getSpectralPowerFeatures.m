@@ -5,4 +5,5 @@ function feat_vector = getSpectralPowerFeatures(x,f,Fs)
 %   f  - Vector containing the frequencies at which to calculate the PSD
 %   Fs - The sampling frequency
 
-feat_vector = 10*log10(pwelch(x,[],[],f,Fs));
+[Pxx,~] = pwelch(double(x),[],[],f,Fs);
+feat_vector = 10*log10(Pxx);

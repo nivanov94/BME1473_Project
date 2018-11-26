@@ -6,8 +6,7 @@
 %                   may contain the raw EEG signals or the ICs.
 %   W               - The 64x64 mixing matrix. W can be the identity matrix if
 %                   we only want to use the original EEG signals.
-%   simple          - A Boolean value that's true if we are just using simple 
-%                   descriptive features and false otherwise.
+%   num_prompts     - A numeric class label
 % output:
 %   eeg_features    - A struct with a similar format to epoch_data containing
 %                   the computed features for the data in epoch_data.

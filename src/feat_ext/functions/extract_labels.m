@@ -9,12 +9,12 @@
 
 function [feature_labels] = extract_labels(params, numframes)
     global feature_fft
-    global feature_wavelet    
     global feature_logfft
     global feature_spf
     global feature_ar
     global feature_dwt
-    global feature_mom
+    global feature_moment
+    global feature_central_moment
 
     
     feature_labels = {};
@@ -45,20 +45,24 @@ function [feature_labels] = extract_labels(params, numframes)
     
     %% Nick's parameters
     % AR
-    nick_ar_enable = params.feature.nick.ar.enable;
-    nick_ar_order = params.feature.nick.ar.order;
-    nick_ar_option = params.feature.nick.ar.option;
-    nick_ar_band = params.feature.nick.ar.band;
-    % Moment
-    nick_mom_enable = params.feature.nick.mom.enable;
-    nick_mom_vector = params.faeture.nick.mom.vector;
+    ar_enable = params.feature.ar.enable;
+    ar_order = params.feature.ar.order;
+    ar_option = params.feature.ar.option;
+    ar_band = params.feature.ar.band;
     % DWT
-    nick_dwt_enable = params.feature.nick.dwt.enable;
-    nick_dwt_option = params.feature.nick.dwt.option;
-    nick_dwt_wavelet = params.feature.nick.dwt.wavelet;
-    nick_dwt_level = params.feature.nick.dwt.level;
+    dwt_enable = params.feature.dwt.enable;
+    dwt_option = params.feature.dwt.option;
+    dwt_wavelet = params.feature.dwt.wavelet;
+    dwt_level = params.feature.dwt.level;
+    % central moment
+    central_moment_enable = params.feature.central_moment.enable;
+    central_moment_values = params.feature.central_moment.values;
+    % Moment
+    moment_enable = params.feature.moment.enable;
+    moment_values = params.faeture.moment.values;
     % SPF
-    nick_spf_enable = params.feature.nick.spf.enable;
+    spf_enable = params.feature.spf.enable;
+    spf_values = params.feature.spf.values;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Create labels 
@@ -174,12 +178,12 @@ function [feature_labels] = extract_labels(params, numframes)
     % Add median window value label
     if median_enable
         for w=1:numframes
-          feature_labels{end+1} = ['Energy:W', int2str(w)];
+          feature_labels{end+1} = ['MEDIAN:W', int2str(w)];
         end
     end
     
     %% Nick's functions
-    if nick_ar_enable
+    if ar_enable
         for d=1:size(feature_ar,2)
           for w=1:numframes
             feature_labels{end+1} = ['AR:W', int2str(w), ',D', int2str(d)];
@@ -187,15 +191,23 @@ function [feature_labels] = extract_labels(params, numframes)
         end
     end
     
-    if nick_mom_enable
-        for d=1:size(feature_mom,2)
+    if moment_enable
+        for d=1:size(feature_moment,2)
           for w=1:numframes
-            feature_labels{end+1} = ['MOM:W', int2str(w), ',D', int2str(d)];
+            feature_labels{end+1} = ['MOMENT:W', int2str(w), ',D', int2str(d)];
           end
         end
     end
     
-    if nick_dwt_enable
+    if central_moment_enable
+        for d=1:size(feature_central_moment,2)
+          for w=1:numframes
+            feature_labels{end+1} = ['CENTRALMOMENT:W', int2str(w), ',D', int2str(d)];
+          end
+        end
+    end
+    
+    if dwt_enable
         for d=1:size(feature_dwt,2)
           for w=1:numframes
             feature_labels{end+1} = ['DWT:W', int2str(w), ',D', int2str(d)];
@@ -203,7 +215,7 @@ function [feature_labels] = extract_labels(params, numframes)
         end
     end
     
-    if nick_spf_enable
+    if spf_enable
         for d=1:size(feature_spf,2)
           for w=1:numframes
             feature_labels{end+1} = ['SPF:W', int2str(w), ',D', int2str(d)];
